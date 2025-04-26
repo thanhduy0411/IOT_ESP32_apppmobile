@@ -12,8 +12,8 @@
 #pragma region classWiFi
 class WIFI {
 public:
-  String TenWiFi = "IoTVision";          // Thay tên WIFI ở đây.
-  String MatKhauWiFi = "IoTVision@2024"; // Thay mật khẩu WIFI ở đây.
+  String TenWiFi = "Thai";          // Thay tên WIFI ở đây.
+  String MatKhauWiFi = "vanibaby"; // Thay mật khẩu WIFI ở đây.
 
 
 public:

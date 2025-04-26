@@ -101,9 +101,9 @@ void TaskLangNgheLenhAppGuiXuongBoard(void* pvParameter) {
 
 
 void KhoiTao(void) {
-#pragma region KhoiTao
+  #pragma region KhoiTao
   //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-#pragma region Các khởi tạo cơ bản của máy      
+      
   // Trước tiên cần phải khởi tạo các PINs.
   _Relay.KhoiTaoCacChan();
   //---------------------------------------------------------------
@@ -119,8 +119,8 @@ void KhoiTao(void) {
 
   //---------------------------------------------------------------
   // Khởi tạo giao tiếp SERIAL
-  Serial.begin(115200);
-  Serial.println("");
+  Serial.begin(9600);
+  
 
 
   //---------------------------------------------------------------
@@ -137,13 +137,13 @@ void KhoiTao(void) {
   _ID = _WiFi.LaySoMAC(); 
 
 
-#ifdef debug
+  #ifdef debug
   Serial.print("ID: ");
   Serial.println(_ID);
-#endif
+  #endif
 
 
-//----------------------------------------------------------------
+  //----------------------------------------------------------------
   // Cảm biến SHT31 đọc nhiệt độ và độ ẩm.
   // Chú ý: Khai báo sau các khai báo pinMode ở trên.
   _SHT31.KhoiTaoSHT31();
@@ -151,16 +151,16 @@ void KhoiTao(void) {
 
 
   //---------------------------------------------------------------
-#pragma endregion Các khởi tạo cơ bản của máy
+  #pragma endregion Các khởi tạo cơ bản của máy
 
 
-#ifdef CoKetNoiServer
-#pragma region Khởi tạo WIFI
+  #ifdef CoKetNoiServer
+  #pragma region Khởi tạo WIFI
   //======================================================================
   //------ Begin: Khởi tạo để có thể cấu hình kết nối WiFi tự động -----//
   //======================================================================
   // Dành 10s để kết nối WiFI
-// Lưu ý: Phải có thời gian chờ cho việc kết nối WIFI nếu không sẽ
+  // Lưu ý: Phải có thời gian chờ cho việc kết nối WIFI nếu không sẽ
   // gây ra tình trạng board bị reset và không thể phát access point (AP).
   // Hàm thực hiện kết nối WiFi đồng thời khởi động chạy Task để sau mỗi
   // chu kỳ t(ms) thì sẽ gọi hàm KiemTraKetNoiWiFi một lần.
@@ -168,18 +168,18 @@ void KhoiTao(void) {
   //======================================================================
   //------ End: Khởi tạo để có thể cấu hình kết nối WiFi tự động -------//
   //======================================================================
-#pragma endregion Khởi tạo WIFI
-#endif
+  #pragma endregion Khởi tạo WIFI
+  #endif
 
 
-#pragma region TaskMultiCore
+  #pragma region TaskMultiCore
   // khởi tạo khóa không cho post get cùng lúc
   _mutexPostGet = xSemaphoreCreateMutex();  
   delay(100);
 
 
-//--------------------------------------------------------------------------
-#ifdef xTaskPOSTDuLieuVeCloud
+  //--------------------------------------------------------------------------
+  #ifdef xTaskPOSTDuLieuVeCloud
   xTaskCreatePinnedToCore(
     TaskPOSTDuLieuVeCloud,                    /* Task function. */
     "Task POSTDuLieuVeCloudDeHienThiTrenAPP", /* name of task. */
@@ -189,9 +189,9 @@ void KhoiTao(void) {
     &_POST,                                   /* Task handle to keep track of created task */
     CORE_1);                                  /* pin task to core 1 */
   delay(500);
-#endif
-//--------------------------------------------------------------------------
-#ifdef xTaskLangNgheLenhAppGuiXuongBoard
+  #endif
+  //--------------------------------------------------------------------------
+  #ifdef xTaskLangNgheLenhAppGuiXuongBoard
   xTaskCreatePinnedToCore(
     TaskLangNgheLenhAppGuiXuongBoard,    /* Task function. */
     "Task LangNgheLenhAppGuiXuongBoard", /* name of task. */
@@ -200,18 +200,20 @@ void KhoiTao(void) {
     1,                                   /* priority of the task */
     &_GET,                               /* Task handle to keep track of created task */
     CORE_0);                             /* pin task to core 0 */
-#endif // xTaskLangNgheLenhAppGuiXuongBoard
+  #endif // xTaskLangNgheLenhAppGuiXuongBoard
 
-#pragma endregion TaskMultiCore
+  #pragma endregion TaskMultiCore
 
 
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-#pragma endregion KhoiTao
+  //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+  Serial.println("Khoi tao xong");
+  #pragma endregion KhoiTao
 }
 
 
 void ChayChuongTrinhChinh(void) {
   delay(1);
+  //POSTDuLieuVeCloudDeHienThiTrenAPP();
 }
 #ifdef xTaskPOSTDuLieuVeCloud
 // Cập nhật dữ liệu về cloud để hiển thị trên APP.
@@ -225,7 +227,7 @@ void POSTDuLieuVeCloudDeHienThiTrenAPP(void) {
     // Lấy thời gian thực trên board.
     _RTC.LayRTCTuDS3231();
 
-
+    Serial.println("Doc cam bien");
     // Đọc giá trị cảm biến nhiệt độ và độ ẩm SHT31.
     _SHT31.DocCamBienNhietDoVaDoAmSHT31();
 

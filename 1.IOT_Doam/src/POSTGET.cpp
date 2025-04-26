@@ -16,27 +16,31 @@
 // HH:MM:SS DD/MM/YYYY = 19:53:13 02/08/2023
 //=========================================================================//
 bool POSTGET::POSTDuLieuBoard(String ID, String DuLieu) {
-    if (WiFi.status() == WL_CONNECTED) {
-      try {
-          if (WiFi.status() == WL_CONNECTED) {
-          this->http.setTimeout(timeout);  // Thiết lập thời gian timeout.
-          this->http.begin(URL_POSTDuLieuTuBoardLenServer);
-          this->http.addHeader("Content-Type", "application/json");
-          String data = "{\"ID\":\"" + ID + "\",\"S\":\"" + DuLieu + "\"}";
-          this->http.POST(data);  //Send the request
-          this->http.end();
-  
-  
-          return 1;
-          } else
-          return 0;
-      } catch (String error) {
+  if (WiFi.status() == WL_CONNECTED) {
+    try {
+    	if (WiFi.status() == WL_CONNECTED) {
+        this->http.setTimeout(timeout);  // Thiết lập thời gian timeout.
+        this->http.begin(URL_POSTDuLieuTuBoardLenServer);
+        this->http.addHeader("Content-Type", "application/json");
+        String data = "{\"ID\":\"" + ID + "\",\"S\":\"" + DuLieu + "\"}";
+        this->http.POST(data);  //Send the request
+        this->http.end();
+
+
+        return 1;
+    	} else
         return 0;
-      }
+    } catch (String error) {
+      return 0;
     }
   }
-//=========================================================================//
-String POSTGET::GETLenhGuiXuongBoard(String ID) {
+  else
+  {
+    return 0;
+  }
+}
+  //=========================================================================//
+  String POSTGET::GETLenhGuiXuongBoard(String ID) {
   try {
     if (WiFi.status() == WL_CONNECTED) {
       String url = URL_GETLenhGuiXuongBoard + ID;
