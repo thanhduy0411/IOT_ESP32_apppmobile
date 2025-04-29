@@ -22,7 +22,11 @@ bool POSTGET::POSTDuLieuBoard(String ID, String DuLieu) {
         this->http.setTimeout(timeout);  // Thiết lập thời gian timeout.
         this->http.begin(URL_POSTDuLieuTuBoardLenServer);
         this->http.addHeader("Content-Type", "application/json");
+        Serial.print("Du lieu: ");
+         Serial.println(DuLieu);
         String data = "{\"ID\":\"" + ID + "\",\"S\":\"" + DuLieu + "\"}";
+        Serial.print("Data: ");
+         Serial.println(data);
         this->http.POST(data);  //Send the request
         this->http.end();
 

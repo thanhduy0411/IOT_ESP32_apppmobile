@@ -2,7 +2,8 @@
 #include "WIFI1.h"
 #include "POSTGET.h"
 #include "RTC.h"
-#include "MySHT31.h"
+//=Block Tam #include "MySHT31.h"
+#include "DHT22.h" // cảm biến DHT22
 #include "Relay.h"
 
 
@@ -21,7 +22,8 @@
 WIFI _WiFi;       // Kết nối WiFi cho board.
 POSTGET _POSTGET; // Các hàm thực thi POST - GET giữa device và serve.
 RTC _RTC;         // Mô-đun thời gian thực DS3231.
-SHT3x _SHT31;     // Cảm biến nhiệt độ và độ ẩm SHT21.
+//=Block tam SHT3x _SHT31;     // Cảm biến nhiệt độ và độ ẩm SHT21.
+DHT2x _DHT22;     // Cảm biến nhiệt độ và độ ẩm DHT22.
 Relay _Relay;     // Điều khiển rơ-le
 int _LenhONOFFK1 = 0; // Lệnh điều khiển ON/OFF K1 gửi từ app xuống board.
 int _LenhONOFFK2 = 0; // Lệnh điều khiển ON/OFF K2 gửi từ app xuống board.
@@ -146,7 +148,7 @@ void KhoiTao(void) {
   //----------------------------------------------------------------
   // Cảm biến SHT31 đọc nhiệt độ và độ ẩm.
   // Chú ý: Khai báo sau các khai báo pinMode ở trên.
-  _SHT31.KhoiTaoSHT31();
+  _DHT22.KhoiTaoDHT22();
   //----------------------------------------------------------------
 
 
@@ -204,7 +206,7 @@ void KhoiTao(void) {
 
   #pragma endregion TaskMultiCore
 
-
+    
   //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
   Serial.println("Khoi tao xong");
   #pragma endregion KhoiTao
@@ -229,7 +231,7 @@ void POSTDuLieuVeCloudDeHienThiTrenAPP(void) {
 
     Serial.println("Doc cam bien");
     // Đọc giá trị cảm biến nhiệt độ và độ ẩm SHT31.
-    _SHT31.DocCamBienNhietDoVaDoAmSHT31();
+    _DHT22.DocCamBienNhietDoVaDoAmDHT22();
 
 
     //===================================================================
@@ -258,8 +260,8 @@ void POSTDuLieuVeCloudDeHienThiTrenAPP(void) {
     String s03 = "0"; // Do board này không có relay K4
     String s04 = String(_Relay.MODE);
     String s05 = String(_WiFi.TinhDoManhCuaWiFi());
-    String s1 = String(_SHT31.NhietDo);
-    String s2 = String(_SHT31.DoAm);
+    String s1 = String(_DHT22.NhietDo_DHT);
+    String s2 = String(_DHT22.DoAm_DHT);
     String s3 = _RTC.ChuanHoaChuoiRTCDeGuiVeServer();
     String data = s00+s01+s02+s03+s04+s05+";"+s1+";"+s2+";"+s3;
     //-----------------------------------------------------------------------------------------

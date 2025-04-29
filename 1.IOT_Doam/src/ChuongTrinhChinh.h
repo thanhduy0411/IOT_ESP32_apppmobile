@@ -11,7 +11,7 @@
 
 #define pinSCL 18 // Chân SCL của I2C nối cảm biến nhiệt độ & độ ẩm SHT3x
 #define pinSDA 19 // Chân SDA của I2C nối cảm biến nhiệt độ & độ ẩm SHT3x
-
+#define DHTPIN 4 // //Chân data cua DHT 22
 
 void KhoiTao(void);               
 void ChayChuongTrinhChinh(void);  
