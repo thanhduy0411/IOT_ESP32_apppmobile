@@ -14,9 +14,17 @@ void SHT3x::KhoiTaoSHT31(void) {
 void SHT3x::DocCamBienNhietDoVaDoAmSHT31() {
   sht31.read();
   NhietDo = sht31.getTemperature();
+  Serial.print("Nhiệt độ doc duoc : ");
+  Serial.println(NhietDo);
   NhietDo = double(round(NhietDo * 100) / 100);  // will round to 2 decimal places i.e. 0.00
+  Serial.print("Nhiệt độ converter : ");
+  Serial.println(NhietDo);
   DoAm = sht31.getHumidity();
+  Serial.print("Độ ẩm doc duoc : ");
+  Serial.println(DoAm);
   DoAm = double(round(DoAm * 100) / 100);  // will round to 2 decimal places i.e. 0.00
+  Serial.print("Độ ẩm converter : ");
+  Serial.println(DoAm);
 
 
   // Trường hợp không có kết nối cảm biến thì giá trị trả về là 
