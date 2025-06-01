@@ -57,6 +57,8 @@ bool POSTGET::POSTDuLieuBoard(String ID, String DuLieu) {
       int httpCodeGet = this->http.GET();
       if (httpCodeGet == HTTP_CODE_OK) {  // needs a 200 to continue...
         String data = this->http.getString();
+        Serial.print("(ms) for fist GET ");
+        Serial.println(data);
         data.remove(0, 1);                  // Loại ký tự '[' tại đầu chuỗi.
         data.remove(data.length() - 1, 1);  // Loại ký tự ']' tại cuối chuỗi.
         this->http.end();

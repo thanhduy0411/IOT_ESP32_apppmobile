@@ -109,3 +109,80 @@ bool Relay::ONOFFBangTayK1(int K1) {
  //================== End: ĐÓNG NGẮT RƠLE BẰNG TAY =========================//
  //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
  
+
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//============= Begin: BOARD LÀM VIỆC Ở CHẾ ĐỘ TỰ ĐỘNG ====================//
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+#pragma region BOARD LÀM VIỆC Ở CHẾ ĐỘ TỰ ĐỘNG
+bool Relay::TuDongDongNgatKenh1TheoNhietDo(double NhietDo, double MIN, double MAX) {
+  //=======================================================================//
+  //--------- Begin: Đóng ngắt kênh 1 dựa theo cảm biến nhiệt độ ----------//
+  //=======================================================================//
+  if (NhietDo < MIN) {
+    // Chỉ thay đổi khi trạng thái trước đó của K1 là ON
+    if (this->K1 == 1) {
+      this->K1 = 0;
+      digitalWrite(_pinRelay1, _OFF);  // Rơle 1 OFF
+
+
+      // Trả về true nếu có thực thi đóng/ngắt rơle.
+      return true;
+    }
+  } else if (NhietDo > MAX) {
+    // Chỉ thay đổi khi trạng thái trước đó của K1 là OFF
+    if (this->K1 == 0) {
+      this->K1 = 1;
+      digitalWrite(_pinRelay1, _ON);  // Rơle 1 ON
+
+
+      // Trả về true nếu có thực thi đóng/ngắt rơle.
+      return true;
+    }
+  }
+  //=======================================================================//
+  //--------- End: Đóng ngắt kênh 1 dựa theo cảm biến nhiệt độ ------------//
+  //=======================================================================//
+
+
+  // Trả về false nếu không có thực thi đóng/ngắt rơle.
+  return false;
+}
+bool Relay::TuDongDongNgatKenh2TheoDoAm(double DoAm, double MIN, double MAX) {
+  //=======================================================================//
+  //--------- Begin: Đóng ngắt kênh 2 dựa theo cảm biến độ ẩm -------------//
+  //=======================================================================//
+  if (DoAm < MIN) {
+    // Chỉ thay đổi khi trạng thái trước đó của K2 là OFF
+    if (this->K2 == 0) {
+      this->K2 = 1;
+      digitalWrite(_pinRelay2, _ON);  // Rơle 2 ON
+
+
+      // Trả về true nếu có thực thi đóng/ngắt rơle.
+      return true;
+    }
+  } else if (DoAm > MAX) {
+    // Chỉ thay đổi khi trạng thái trước đó của K2 là ON
+    if (this->K2 == 1) {
+      this->K2 = 0;
+      digitalWrite(_pinRelay2, _OFF);  // Rơle 2 OFF
+
+
+      // Trả về true nếu có thực thi đóng/ngắt rơle.
+      return true;
+    }
+  }
+  //=======================================================================//
+  //--------- End: Đóng ngắt kênh 2 dựa theo cảm biến độ ẩm ---------------//
+  //=======================================================================//
+
+
+  // Trả về false nếu không có thực thi đóng/ngắt rơle.
+  return false;
+}
+#pragma endregion BOARD LÀM VIỆC Ở CHẾ ĐỘ TỰ ĐỘNG
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//============= End: BOARD LÀM VIỆC Ở CHẾ ĐỘ TỰ ĐỘNG ======================//
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+

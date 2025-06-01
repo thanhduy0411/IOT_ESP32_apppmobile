@@ -36,6 +36,8 @@ class Relay {
     
       bool ONOFFBangTayK1(int K1);
       bool ONOFFBangTayK2(int K2);
+      bool TuDongDongNgatKenh1TheoNhietDo(double NhietDo, double MIN, double MAX);
+      bool TuDongDongNgatKenh2TheoDoAm(double DoAm, double MIN, double MAX);
     };
     
     

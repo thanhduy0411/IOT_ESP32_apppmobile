@@ -10,7 +10,6 @@
 #define CoKetNoiServer // Khai báo để dùng tính năng POST/GET với server.
 #define xTaskPOSTDuLieuVeCloud // Để thực thi task POST dữ liệu 
 #define xTaskLangNgheLenhAppGuiXuongBoard    // Để thực thi task lắng nghe lệnh gửi từ app xuống board (chạy ở core 1).
-#define xTaskDieuKhienONOFF // Sau mỗi t(s), ex: 5s, sẽ gọi hàm BoardLamViec() để tự động điều khiển.
 //------------------------------------------------------------------------
 #define CORE_1 1     // core 1 
 #define CORE_0 0     // core 0
@@ -59,7 +58,7 @@ void TaskPOSTDuLieuVeCloud(void* pvParameter) {
     if (xSemaphoreTake(_mutexPostGet, portMAX_DELAY) == pdTRUE) {
       // Nếu đếm đủ thời điểm đã thiết lập cho phép POST dữ liệu 
       // lên cloud (ex: 60000 => 1 phút)
-      if (_tickPOSTDuLieu >= 5000 || _ChoPhepPOSTDuLieu == true) {
+      if (_tickPOSTDuLieu >= 6000 || _ChoPhepPOSTDuLieu == true) {
         _tickPOSTDuLieu = 0;
         _ChoPhepPOSTDuLieu = false;
         POSTDuLieuVeCloudDeHienThiTrenAPP();
@@ -99,41 +98,7 @@ void TaskLangNgheLenhAppGuiXuongBoard(void* pvParameter) {
 }
 #endif
 #pragma endregion TaskLangNgheLenhAppGuiXuongBoard
-//========================================================================//
-#pragma region TaskDieuKhienONOFF
-#ifdef xTaskDieuKhienONOFF
-void TaskDieuKhienONOFF(void* pvParameter) {
-#ifdef debug
-  Serial.print("TaskDieuKhienONOFF đang chạy ở core ");
-  Serial.println(xPortGetCoreID());
-#endif
 
-
-  for (;;) {
-    // Trả về true nếu có thay đổi trạng thái làm việc của các K1, K2, MODE1, MODE2.
-    // Ngược lại sẽ trả về false.
-    bool CoChuyenTrangThai = BoardLamViec();
-
-
-    // Chỉ gọi lệnh POSTDuLieuBoard khi có sự thay đổi trạng thái
-    // đóng/ngắt của 1 trong 2 rơle
-    if (CoChuyenTrangThai == true) {
-      // Bật cờ cho phép POST dữ liệu lên cloud để hàm POSTDuLieuVeCloudDeHienThiTrenAPP() được phép
-      // thực thi trong TaskPOSTDuLieuVeCloud
-      _ChoPhepPOSTDuLieu = true;
-    }
-
-
-    vTaskDelay(pdMS_TO_TICKS(5000));  // 5s
-
-
-#ifdef debug
-    Serial.printf("Kích thước task TaskDieuKhienONOFF%u\n", uxTaskGetStackHighWaterMark(NULL));
-#endif
-  }
-}
-#endif
-#pragma endregion TaskDieuKhienONOFF
 //========================================================================//
 #pragma endregion Tasks
 
@@ -149,7 +114,7 @@ void KhoiTao(void) {
   // thiết bị trong hệ thống đều phải OFF để đảm bảo các thiết bị
   // OFF ngay thời điểm mở máy lên.
   _Relay.OFFCacRole();
-  //_Relay.MODE = _AUTO; // Nếu muốn ON|OFF K1&K2 tự động theo nhiệt độ và độ ẩm thì khai báo MODE là _AUTO.
+
 
   _Relay.MODE = _MANUAL; // Với board ví dụ này thì MODE là MANUAL.
   //---------------------------------------------------------------
@@ -227,7 +192,7 @@ void KhoiTao(void) {
     6,                                        /* priority of the task */
     &_POST,                                   /* Task handle to keep track of created task */
     CORE_1);                                  /* pin task to core 1 */
-  delay(50);
+  delay(500);
   #endif
   //--------------------------------------------------------------------------
   #ifdef xTaskLangNgheLenhAppGuiXuongBoard
@@ -238,19 +203,8 @@ void KhoiTao(void) {
     NULL,                                /* parameter of the task */
     1,                                   /* priority of the task */
     &_GET,                               /* Task handle to keep track of created task */
-    CORE_0);  
-   // delay(1);                           /* pin task to core 0 */
+    CORE_0);                             /* pin task to core 0 */
   #endif // xTaskLangNgheLenhAppGuiXuongBoard
-  #ifdef xTaskDieuKhienONOFF
-  xTaskCreatePinnedToCore(
-    TaskDieuKhienONOFF,    /* Task function. */
-    "Task DieuKhienONOFF", /* name of task. */
-    10000,                 /* Stack size of task */
-    NULL,                  /* parameter of the task */
-    2,                     /* priority of the task */
-    NULL,                  /* Task handle to keep track of created task */
-    CORE_1);               /* pin task to core 1 */
-#endif
 
   #pragma endregion TaskMultiCore
 
@@ -349,16 +303,6 @@ bool BoardLamViec(void) {
         ONOFF_K1 = _Relay.ONOFFBangTayK1(_LenhONOFFK1);
     ONOFF_K2 = _Relay.ONOFFBangTayK2(_LenhONOFFK2);
       }
-       else if (_Relay.MODE == _AUTO) {
-      _SHT31.DocCamBienNhietDoVaDoAmSHT31();
-      double MIN_NhietDo = 34; // Các em có thể thay đổi nhiệt độ MIN.
-      double MAX_NhietDo = 35; // Các em có thể thay đổi nhiệt độ MAX.
-      double MIN_DoAm = 70; // Các em có thể thay đổi độ ẩm MIN.
-      double MAX_DoAm = 80; // Các em có thể thay đổi độ ẩm MAX.
-      ONOFF_K1 = _Relay.TuDongDongNgatKenh1TheoNhietDo(_SHT31.NhietDo, MIN_NhietDo, MAX_NhietDo);
-      ONOFF_K2 = _Relay.TuDongDongNgatKenh2TheoDoAm(_SHT31.DoAm, MIN_DoAm, MAX_DoAm);
-    }
-
       //-----------------------------------------------------------------------
   
   
@@ -430,38 +374,6 @@ bool BoardLamViec(void) {
     #endif
         }
       }
-      else if (_CODE ==7)
-      {
-        _ChoPhepPOSTDuLieu = false;
-        _CODE = 0;
-        _Relay.MODE = _AUTO; 
-        // Gửi CODE=0 về server để app biết board đã nhận được lệnh mã CODE thành công.
-        String CODEGuiVeServe = "0";
-        CapNhatCODETrenServer(CODEGuiVeServe);
-        _ChoPhepPOSTDuLieu = true;
-      }
-      else if (_CODE ==16)
-      {
-        _ChoPhepPOSTDuLieu = false;
-        _CODE = 0;
-        _Relay.MODE = _MANUAL; 
-        // Gửi CODE=0 về server để app biết board đã nhận được lệnh mã CODE thành công.
-        String CODEGuiVeServe = "0";
-        CapNhatCODETrenServer(CODEGuiVeServe);
-        _ChoPhepPOSTDuLieu = true;
-      }
-      else if (_CODE == 3 || _CODE == 32)
-      {
-        _ChoPhepPOSTDuLieu = false;
-        _CODE = 0;
-        _Relay.MODE = _MANUAL; 
-        // Gửi CODE=0 về server để app biết board đã nhận được lệnh mã CODE thành công.
-        String CODEGuiVeServe = "32";
-        CapNhatCODETrenServer(CODEGuiVeServe);
-        _ChoPhepPOSTDuLieu = true;
-      }
-      
-      
     #pragma endregion CODE = CODEUserChonONOFF : Thực hiện điều khiển chạy / dừng bằng nút ON / OFF trên app.
     //-----------------------------------------------------------------//
     #pragma endregion ThucThiTacVuTheoCODE
@@ -476,8 +388,7 @@ bool BoardLamViec(void) {
 
   // GET dữ liệu từ app xuống board, gồm trạng thái các nút điều khiển, chế độ làm việc cho từng kênh, mã CODE.
   String strLenhGuiXuongBoard = _POSTGET.GETLenhGuiXuongBoard(_ID);
-     Serial.println("Nội dung lắng nghe: ");
-     Serial.println(strLenhGuiXuongBoard);
+
 
   if (strLenhGuiXuongBoard.length() > 0) {
 #pragma region Lấy lệnh gửi từ app xuống board thành công
@@ -491,11 +402,7 @@ bool BoardLamViec(void) {
       _RTC.LayRTCTuServerCaiDatChoDS3231();
       _FlagTime =true;
     }
-    else{
-      _FlagTime = false;
-           
-    }
-    
+    else{_FlagTime = false;}
 
 #ifdef debug
     Serial.print("CODE gửi xuống board: ");
@@ -521,7 +428,6 @@ _LenhONOFFK2 = S.substring(1, 2).toInt(); //Lấy lệnh điều khiển đóng 
 
 
       ThucThiTacVuTheoCODE();
-      
     }
 #pragma endregion Lấy lệnh gửi từ app xuống board thành công
   } else {
